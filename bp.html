@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAT Tax Calculator with Credit Carry Forward</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 20px;
+        }
+        .container {
+            background: #fff;
+            padding: 50px;
+            border-radius: 8px;
+            width: 600px;
+            margin: auto;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            width: 100%;
+            margin-top: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>MAT Tax Calculator (with Credit Carry Forward)</h2>
+        <h5>1. What is Book Profit?</h5>
+        <ul>
+            <li>Book profit is the net profit of a company as per its profit and loss account.</li>
+            <li>It is adjusted based on specific rules in the Income Tax Act before calculating tax liability.</li>
+        </ul>
+        
+        <h5>2. What is Minimum Alternate Tax (MAT)?</h5>
+        <ul>
+            <li>Some companies report high book profits but claim deductions/exemptions under tax laws, reducing their taxable income.</li>
+            <li>To ensure such companies still pay a minimum tax, the government introduced MAT under Section 115JB.</li>
+            <li>MAT ensures that a company pays at least 15% of its book profit as tax.</li>
+        </ul>
+        
+        <h5>3. When Does MAT Apply?</h5>
+        <ul>
+            <li>If a company's normal tax liability (as per regular tax calculations) is less than 15% of its book profit, MAT is charged instead.</li>
+        </ul>
+        
+        <h5>4. What is MAT Credit?</h5>
+        <ul>
+            <li>If a company pays MAT instead of normal tax, the extra tax paid is stored as MAT Credit.</li>
+            <li>This MAT Credit can be carried forward for 15 years and used in future years when normal tax becomes higher than MAT.</li>
+        </ul>
+        
+        <label for="bookProfit">Book Profit (₹):</label>
+        <input type="number" id="bookProfit" placeholder="Enter Book Profit" required>
+
+        <label for="normalTax">Normal Tax (₹):</label>
+        <input type="number" id="normalTax" placeholder="Enter Normal Tax" required>
+
+        <label for="prevMatCredit">Previous MAT Credit (₹):</label>
+        <input type="number" id="prevMatCredit" placeholder="Enter Previous MAT Credit (if any)" value="0" required>
+
+        <button onclick="calculateMAT()">Calculate Tax</button>
+        <button onclick="goamt()">Next</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function calculateMAT() {
+            let bookProfit = parseFloat(document.getElementById("bookProfit").value);
+            let normalTax = parseFloat(document.getElementById("normalTax").value);
+            let prevMatCredit = parseFloat(document.getElementById("prevMatCredit").value);
+
+            if (isNaN(bookProfit) || isNaN(normalTax) || isNaN(prevMatCredit) || bookProfit < 0 || normalTax < 0 || prevMatCredit < 0) {
+                document.getElementById("result").innerHTML = "<p style='color: red;'>Please enter valid values.</p>";
+                return;
+            }
+
+            // Calculate MAT (15% of Book Profit)
+            let mat = 0.15 * bookProfit;
+
+            let taxPayable, matCredit, usedMatCredit = 0;
+            
+            if (normalTax < mat) {
+                // MAT applies, excess MAT is stored as MAT Credit
+                taxPayable = mat;
+                matCredit = mat - normalTax;
+            } else {
+                // Normal Tax applies, check if we can use previous MAT Credit
+                if (prevMatCredit > 0) {
+                    usedMatCredit = Math.min(prevMatCredit, normalTax - mat);  // Use only what is needed
+                    taxPayable = normalTax - usedMatCredit;
+                    matCredit = prevMatCredit - usedMatCredit;
+                } else {
+                    taxPayable = normalTax;
+                    matCredit = 0;
+                }
+            }
+
+            // Display results
+            document.getElementById("result").innerHTML = `
+                <h3>Results</h3>
+                <p><strong>Minimum Alternate Tax (MAT):</strong> ₹${mat.toFixed(2)}</p>
+                <p><strong>Tax Payable:</strong> ₹${taxPayable.toFixed(2)}</p>
+                <p><strong>MAT Credit (Carry Forward for Future):</strong> ₹${matCredit.toFixed(2)}</p>
+                <p><strong>MAT Credit Used This Year:</strong> ₹${usedMatCredit.toFixed(2)}</p>
+            `;
+        }
+        function goamt() {
+    window.location.href = "amt.html";
+}
+    </script>
+
+</body>
+</html>
+

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Loss Adjustment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .output {
+            text-align: left;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Business Loss Adjustment</h2>
+    <h5>A business loss occurs when expenses exceed revenue in a financial year. It can be carried forward and offset against future profits, reducing taxable income and lowering tax liability.</h5>
+
+    <label> Year Loss:</label>
+    <input type="number" id="loss" placeholder="Enter loss amount">
+
+    <label>Future Profits (comma-separated):</label>
+    <input type="text" id="profits" placeholder="e.g., 300000, 400000, 600000">
+
+    <button onclick="calculateLoss()">Calculate</button>
+
+    <div class="output" id="output"></div>
+    <button onclick="goti()">Next</button>
+</div>
+
+<script>
+function calculateLoss() {
+    let loss = parseInt(document.getElementById("loss").value);
+    let profits = document.getElementById("profits").value.split(",").map(Number);
+    let outputDiv = document.getElementById("output");
+    outputDiv.innerHTML = "";
+
+    if (isNaN(loss) || loss <= 0) {
+        outputDiv.innerHTML = "<p style='color: red;'>Please enter a valid loss amount.</p>";
+        return;
+    }
+
+    if (profits.some(isNaN)) {
+        outputDiv.innerHTML = "<p style='color: red;'>Please enter valid profit values.</p>";
+        return;
+    }
+
+    let remainingLoss = loss;
+    let resultHTML = "<h3>Adjustment Process</h3>";
+
+    for (let i = 0; i < profits.length; i++) {
+        if (remainingLoss > 0) {
+            if (profits[i] >= remainingLoss) {
+                profits[i] -= remainingLoss;
+                remainingLoss = 0;
+            } else {
+                remainingLoss -= profits[i];
+                profits[i] = 0;
+            }
+        }
+        resultHTML += `<p>Year ${i + 1} - Taxable Profit: ₹${profits[i].toLocaleString()}</p>`;
+    }
+
+    if (remainingLoss > 0) {
+        resultHTML += `<p style='color: red;'>Remaining Loss Unadjusted: ₹${remainingLoss.toLocaleString()}</p>`;
+    } else {
+        resultHTML += `<p style='color: green;'>Loss Fully Adjusted!</p>`;
+    }
+
+    outputDiv.innerHTML = resultHTML;}
+    function goti() {
+    window.location.href = "ti.html";
+}
+
+</script>
+
+</body>
+</html>
+
+

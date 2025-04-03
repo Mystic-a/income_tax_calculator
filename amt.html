@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMT Tax Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 50%;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input {
+            width: 90%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #218838;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Alternative Minimum Tax (AMT) Calculator</h2>
+        <h5>📌 When Does AMT Apply?</h5>
+
+    <li>✅ AMT is applicable only if the taxpayer's Adjusted Total Income (ATI) exceeds ₹20 lakh.</li>
+    <li>✅ AMT applies mainly to those claiming deductions under:</li>
+    
+        <li>Section 80H to 80RRB (e.g., export businesses, new startups, R&D benefits)</li>
+        <li>Section 10AA (businesses operating in SEZs)</li>
+        <li>Section 35AD (investment-linked deductions)</li>
+    
+
+
+<h5>🔢 How is AMT Calculated?</h5>
+
+    <li><strong>Step 1: Calculate Adjusted Total Income (ATI)</strong></li>
+    
+        <li>ATI =</li>
+        
+            <li>✔ Normal taxable income (as per tax laws)</li>
+            <li>➕ Add back deductions claimed under special sections (like 80H, 10AA, and 35AD)</li>
+        
+    
+    <li><strong>Step 2: Apply AMT Rate</strong></li>
+    
+        <li>✅ AMT tax rate = 18.5% of ATI (plus surcharge & cess)</li>
+        <li>✅ For LLPs, the rate is fixed at 18.5%</li>
+    
+
+
+<h5>📌 Why is AMT Important?</h5>
+
+    <li>✔ Ensures that businesses with high deductions still pay some tax</li>
+    <li>✔ Prevents tax avoidance by those claiming large exemptions</li>
+    <li>✔ Ensures fair contribution from all taxpayers</li>
+
+
+<h5>📌 AMT Credit: What Happens if You Pay More?</h5>
+
+    <li>If a taxpayer pays more under AMT than normal tax, the extra amount is stored as AMT Credit.</li>
+    <li>This credit can be carried forward for 15 years and used when normal tax exceeds AMT in future years.</li>
+
+
+        <label for="normalIncome">Normal Total Income (₹):</label>
+        <input type="number" id="normalIncome" placeholder="Enter normal total income">
+
+        <label for="deductions">Deductions (₹):</label>
+        <input type="number" id="deductions" placeholder="Enter deductions (Section 35AD, etc.)">
+
+        <button onclick="calculateAMT()">Calculate AMT</button>
+        <button onclick="gontp()">Next</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        let amtCredit = 0;  // Stores AMT credit for future years
+
+        function calculateAMT() {
+            let normalIncome = parseFloat(document.getElementById("normalIncome").value) || 0;
+            let deductions = parseFloat(document.getElementById("deductions").value) || 0;
+
+            let adjustedTotalIncome = normalIncome + deductions;
+            let amt = (0.185 * adjustedTotalIncome);  // 18.5% AMT rate
+            amt += (0.04 * amt);  // 4% Cess on AMT
+            amt = Math.round(amt);
+
+            let normalTax = Math.round(0.25 * normalIncome);  // Assuming 25% tax rate
+
+            let taxToPay = 0;
+            let amtCreditUsed = 0;
+
+            if (amt > normalTax) {
+                taxToPay = amt;
+                amtCredit += (amt - normalTax);  // Store excess AMT as credit
+            } else {
+                let taxWithCredit = normalTax;
+                if (amtCredit > 0) {
+                    amtCreditUsed = Math.min(amtCredit, normalTax - amt);
+                    taxWithCredit -= amtCreditUsed;
+                    amtCredit -= amtCreditUsed;
+                }
+                taxToPay = taxWithCredit;
+            }
+
+            document.getElementById("result").innerHTML = `
+                <p>Adjusted Total Income: ₹${adjustedTotalIncome}</p>
+                <p>Alternative Minimum Tax (AMT): ₹${amt}</p>
+                <p>Normal Tax: ₹${normalTax}</p>
+                <p>AMT Credit Used: ₹${amtCreditUsed}</p>
+                <p>Tax Payable This Year: ₹${taxToPay}</p>
+                <p>AMT Credit Carry Forward: ₹${amtCredit}</p>
+            `;
+        }
+        function gontp() {
+    window.location.href = "ntp.html";
+}
+    </script>
+
+</body>
+</html>

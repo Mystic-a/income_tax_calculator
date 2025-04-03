@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Total Income Computation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 20px;
+        }
+
+        .container {
+            width: 40%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px gray;
+            margin: auto;
+        }
+
+        input, button {
+            width: 90%;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Computation of Total Income</h2>
+
+        <label>Profit Before Tax (₹):</label>
+        <input type="number" id="profitBeforeTax" placeholder="Enter profit before tax">
+
+        <h3>Income from Other Sources</h3>
+        <label>Interest on IT Refund (₹):</label>
+        <input type="number" id="interestRefund" placeholder="Enter interest on IT refund">
+
+        <label>Interest from Savings Account (₹):</label>
+        <input type="number" id="interestSavings" placeholder="Enter interest from savings">
+
+        <label>Interest on Bank FDR (₹):</label>
+        <input type="number" id="interestFDR" placeholder="Enter interest on FDR">
+
+        <button onclick="calculateTotalIncome()">Compute</button>
+        <button onclick="gotiss()">Next</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function roundOffIncome(income) {
+            return Math.round(income); // Rounds to the nearest whole number (U/S 288A)
+        }
+
+        function calculateTotalIncome() {
+            let profitBeforeTax = parseFloat(document.getElementById("profitBeforeTax").value) || 0;
+            let interestRefund = parseFloat(document.getElementById("interestRefund").value) || 0;
+            let interestSavings = parseFloat(document.getElementById("interestSavings").value) || 0;
+            let interestFDR = parseFloat(document.getElementById("interestFDR").value) || 0;
+
+            let totalIncomeSources = interestRefund + interestSavings + interestFDR;
+            let grossTotalIncome = profitBeforeTax + totalIncomeSources;
+            let totalIncomeRounded = roundOffIncome(grossTotalIncome);
+
+            document.getElementById("result").innerHTML = `
+                <p><strong>Income from Other Sources: ₹${totalIncomeSources}</strong></p>
+                <p><strong>Gross Total Income: ₹${grossTotalIncome}</strong></p>
+                <p><strong>Total Income (Rounded Off U/S 288A): ₹${totalIncomeRounded}</strong></p>
+            `;
+        }
+        function gotiss() {
+    window.location.href = "tiss.html";
+}
+    </script>
+</body>
+</html>
+
+

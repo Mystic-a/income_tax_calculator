@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Computation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            margin: 20px;
+        }
+
+        .container {
+            width: 50%;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px gray;
+            margin: auto;
+        }
+
+        input, button {
+            width: 90%;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Computation of Tax on Total Income</h2>
+
+        <label>Total Taxable Income (₹):</label>
+        <input type="number" id="totalIncome" placeholder="Enter total income">
+
+        <label>Tax Already Deducted at Source (TDS)/GST (₹):</label>
+        <input type="number" id="tds" placeholder="Enter TDS deducted">
+
+        <label>Rebate U/S 87A (₹):</label>
+        <p>A tax rebate is a refund that you are eligible for if the taxes paid by you exceed your tax liability.</p>
+        <input type="number" id="rebate" placeholder="Enter rebate (if applicable)">
+
+        <button onclick="computeTax()">Compute Tax</button>
+        <button onclick="downloadPDF()">Download PDF</button>
+        <button onclick="golast()">Next</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function calculateTax(income) {
+            let tax = 0;
+            
+            if (income > 2400000) {
+                tax += (income - 2400000) * 0.30;
+                income = 2400000;
+            }
+            if (income > 2000000) {
+                tax += (income - 2000000) * 0.25;
+                income = 2000000;
+            }
+            if (income > 1600000) {
+                tax += (income - 1600000) * 0.20;
+                income = 1600000;
+            }
+            if (income > 1200000) {
+                tax += (income - 1200000) * 0.15;
+                income = 1200000;
+            }
+            if (income > 800000) {
+                tax += (income - 800000) * 0.10;
+                income = 800000;
+            }
+            if (income > 400000) {
+                tax += (income - 400000) * 0.05;
+            }
+
+            return tax;
+        }
+
+        function roundOffTax(tax) {
+            return Math.round(tax); 
+        }
+
+        function computeTax() {
+            let totalIncome = parseFloat(document.getElementById("totalIncome").value) || 0;
+            let tds = parseFloat(document.getElementById("tds").value) || 0;
+            let rebate = parseFloat(document.getElementById("rebate").value) || 0;
+
+            let computedTax = calculateTax(totalIncome);
+            let taxAfterRebate = Math.max(computedTax - rebate, 0);
+            let roundedTax = roundOffTax(taxAfterRebate);
+            let finalTaxPayable = Math.max(roundedTax - tds, 0);
+
+            document.getElementById("result").innerHTML = `
+                <p><strong>Computed Tax Before Rebate: ₹${computedTax.toFixed(2)}</strong></p>
+                <p><strong>Tax After Rebate U/S 87A: ₹${taxAfterRebate.toFixed(2)}</strong></p>
+                <p><strong>Rounded Off Tax (U/S 288B): ₹${roundedTax}</strong></p>
+                <p><strong>Final Tax Payable After TDS: ₹${finalTaxPayable}</strong></p>
+            `;
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            let totalIncome = document.getElementById("totalIncome").value || "0";
+            let tds = document.getElementById("tds").value || "0";
+            let rebate = document.getElementById("rebate").value || "0";
+
+            let computedTax = calculateTax(parseFloat(totalIncome));
+            let taxAfterRebate = Math.max(computedTax - parseFloat(rebate), 0);
+            let roundedTax = roundOffTax(taxAfterRebate);
+            let finalTaxPayable = Math.max(roundedTax - parseFloat(tds), 0);
+
+            doc.setFontSize(16);
+            doc.text("Tax Computation Report", 70, 20);
+            doc.setFontSize(12);
+
+            doc.text(`Total Taxable Income: ₹${totalIncome}`, 20, 40);
+            doc.text(`TDS Deducted: ₹${tds}`, 20, 50);
+            doc.text(`Rebate U/S 87A: ₹${rebate}`, 20, 60);
+            doc.text(`Computed Tax Before Rebate: ₹${computedTax.toFixed(2)}`, 20, 70);
+            doc.text(`Tax After Rebate: ₹${taxAfterRebate.toFixed(2)}`, 20, 80);
+            doc.text(`Rounded Off Tax: ₹${roundedTax}`, 20, 90);
+            doc.text(`Final Tax Payable: ₹${finalTaxPayable}`, 20, 100);
+
+            doc.save("Tax_Computation_Report.pdf");
+        }
+
+        function golast() {
+            window.location.href = "last.html";
+        }
+    </script>
+</body>
+</html>
+
+

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Tax Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            margin: auto;
+        }
+        label, input {
+            display: block;
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 8px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #218838;
+        }
+        #result {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Comprehensive Tax Calculator</h2>
+
+        <label>Enter Age:</label>
+        <input type="number" id="age" placeholder="Enter your age">
+
+        <label>Total Income (₹):</label>
+        <input type="number" id="totalIncome" placeholder="Enter your total income">
+
+        <label>Agricultural Income (₹) (Exempt):</label>
+        <input type="number" id="agriIncome" placeholder="Enter agricultural income">
+
+        <label>Deductions (80C, 80D, etc.) (₹):</label>
+        <input type="number" id="deductions" placeholder="Enter total deductions">
+
+        <label>Tax Credits (TDS, MAT Credit, etc.) (₹):</label>
+        <input type="number" id="taxCredits" placeholder="Enter tax credits">
+
+        <label>Business/Capital Loss (₹):</label>
+        <input type="number" id="losses" placeholder="Enter business or capital losses">
+
+        <label>AMT/MAT Credit Adjustment (₹):</label>
+        <input type="number" id="amtMatCredit" placeholder="Enter AMT/MAT Credit Adjustment">
+
+        <button onclick="calculateTax()">Calculate Net Tax Payable</button>
+        <br><br>
+         <button onclick="goif()">Next</button>
+        <p id="result"></p>
+    </div>
+
+    <script>
+        function calculateTax() {
+            let age = parseInt(document.getElementById("age").value) || 0;
+            let income = parseFloat(document.getElementById("totalIncome").value) || 0;
+            let agriIncome = parseFloat(document.getElementById("agriIncome").value) || 0;
+            let deductions = parseFloat(document.getElementById("deductions").value) || 0;
+            let taxCredits = parseFloat(document.getElementById("taxCredits").value) || 0;
+            let losses = parseFloat(document.getElementById("losses").value) || 0;
+            let amtMatCredit = parseFloat(document.getElementById("amtMatCredit").value) || 0;
+
+            // Exclude Agricultural Income from taxable income
+            let taxableIncome = (income - agriIncome) - deductions - losses;
+
+            if (taxableIncome < 0) taxableIncome = 0; // Ensure it doesn't go negative
+
+            let taxPayable = 0;
+
+            // Determine the exemption limit based on age
+            let exemptionLimit = age < 60 ? 250000 : age < 80 ? 300000 : 500000;
+
+            // Apply tax slabs (Old Tax Regime)
+            if (taxableIncome > exemptionLimit && taxableIncome <= 500000) {
+                taxPayable = (taxableIncome - exemptionLimit) * 0.05;
+            } else if (taxableIncome > 500000 && taxableIncome <= 1000000) {
+                taxPayable = 12500 + (taxableIncome - 500000) * 0.2;
+            } else if (taxableIncome > 1000000) {
+                taxPayable = 112500 + (taxableIncome - 1000000) * 0.3;
+            }
+
+            // Apply Rebate under Section 87A (if taxable income is below ₹5,00,000)
+            if (taxableIncome <= 500000) {
+                taxPayable = 0;
+            }
+
+            // Apply Tax Credits and AMT/MAT Credit Adjustments
+            let netTax = taxPayable - taxCredits - amtMatCredit;
+            netTax = netTax < 0 ? 0 : netTax; // Ensure tax is not negative
+
+            // Final Output
+            document.getElementById("result").innerHTML = `
+                <b>Taxable Income:</b> ₹${taxableIncome.toFixed(2)}<br>
+                <b>Tax Before Credits:</b> ₹${taxPayable.toFixed(2)}<br>
+                <b>Tax Credits Applied:</b> ₹${taxCredits.toFixed(2)}<br>
+                <b>AMT/MAT Credit Applied:</b> ₹${amtMatCredit.toFixed(2)}<br>
+                <b>Net Tax Payable:</b> ₹${netTax.toFixed(2)}
+            `;
+        }
+        function goif() {
+    window.location.href = "if.html";
+}
+    </script>
+</body>
+</html>
+

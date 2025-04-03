@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8e8e8;
+            border-radius: 5px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #result {
+            font-size: 18px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Taxable Income Calculator</h2>
+
+        <!-- Previous Year Loss -->
+        <div class="section">
+            <h3>Previous Year Business Loss</h3>
+            <label for="prevLoss">Enter Previous Year Loss (₹):</label>
+            <input type="number" id="prevLoss" value="0">
+        </div>
+
+        <!-- Current Year Income & Expenses -->
+        <div class="section">
+            <h3>Current Year Financials</h3>
+            <label for="revenue">Total Revenue (₹):</label>
+            <input type="number" id="revenue" value="0">
+            <label for="expenses">Total Expenses (₹):</label>
+            <input type="number" id="expenses" value="0">
+        </div>
+
+        <!-- Deductions -->
+        <div class="section">
+            <h3>Deductions</h3>
+            <label for="section80C">Section 80C (Investments) (₹):</label>
+            <p> Investments (Max: ₹1.5 lakh) -
+                Provident Fund (PF) & Public Provident Fund (PPF),
+                Life Insurance Premium,
+                National Savings Certificate (NSC),
+                5-year Fixed Deposits in Banks/Post Office,
+                Equity-Linked Saving Scheme (ELSS),
+                Tuition Fees for children,
+                Home Loan Principal Repayment</p>
+            <input type="number" id="section80C" value="0">
+            <label for="section80D">Section 80D (Health Insurance) (₹):</label>
+            <p>Self, spouse, children: ₹25,000 (₹50,000 for senior citizens),
+                Parents: ₹25,000 (₹50,000 for senior citizens)</p>
+            <input type="number" id="section80D" value="0">
+            <label for="section80E">Section 80E (Education Loan) (₹):</label>
+            <p> Interest paid on loans for higher education (no limit)</p>
+            <input type="number" id="section80E" value="0">
+            <label for="section80G">Section 80G (Donations) (₹):</label>
+            <p>50% or 100% deduction, depending on the organization</p>
+            <input type="number" id="section80G" value="0">
+            <label for="homeLoanInterest">Home Loan Interest (Section 24b) (₹):</label>
+            <p>Up to ₹2 lakh on home loan interest (for self-occupied property)</p>
+            <input type="number" id="homeLoanInterest" value="0">
+        </div>
+
+        <!-- Exemptions -->
+        <div class="section">
+            <h3>Exemptions</h3>
+            <label for="agriIncome">Agricultural Income (₹):</label>
+            <p>Fully exempt if earned from agricultural land in India</p>
+            <input type="number" id="agriIncome" value="0">
+            <label for="capitalGains">Capital Gains Exemption (₹):</label>
+            <p>If you sell property, land, or stocks, you can reinvest the capital gains in another property or government bonds to avoid tax under Section 54, 54EC, or 54F.</p>
+            <input type="number" id="capitalGains" value="0">
+            <label for="startupExemption">Startup Tax Holiday (₹):</label>
+            <p>
+                Eligible startups can claim 100% tax exemption on profits for 3 consecutive years out of the first 10 years.
+            </p>
+            <input type="number" id="startupExemption" value="0">
+        </div>
+
+        <!-- Allowances -->
+        <div class="section">
+            <h3>Allowances</h3>
+            <label for="businessExpenses">Business Expenses (₹):</label>
+            <input type="number" id="businessExpenses" value="0">
+            <label for="officeRent">Office Rent & Employee Salaries (₹):</label>
+            <input type="number" id="officeRent" value="0">
+            <label for="marketing">Marketing & Advertising (₹):</label>
+            <input type="number" id="marketing" value="0">
+            <label for="workFromHome">Work-From-Home Expenses (₹):</label>
+            <input type="number" id="workFromHome" value="0">
+        </div>
+
+        <!-- Calculate Button -->
+        <button onclick="calculateTaxableIncome()">Calculate Taxable Income</button>
+        <button onclick="gobp()">Next</button>
+        <!-- Result -->
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function calculateTaxableIncome() {
+            let prevLoss = parseFloat(document.getElementById("prevLoss").value) || 0;
+            let revenue = parseFloat(document.getElementById("revenue").value) || 0;
+            let expenses = parseFloat(document.getElementById("expenses").value) || 0;
+
+            let profitOrLoss = revenue - expenses;
+            let adjustedIncome = profitOrLoss >= 0 ? Math.max(profitOrLoss - prevLoss, 0) : profitOrLoss;
+
+            let deductions = (
+                parseFloat(document.getElementById("section80C").value) +
+                parseFloat(document.getElementById("section80D").value) +
+                parseFloat(document.getElementById("section80E").value) +
+                parseFloat(document.getElementById("section80G").value) +
+                parseFloat(document.getElementById("homeLoanInterest").value)
+            ) || 0;
+
+            let exemptions = (
+                parseFloat(document.getElementById("agriIncome").value) +
+                parseFloat(document.getElementById("capitalGains").value) +
+                parseFloat(document.getElementById("startupExemption").value)
+            ) || 0;
+
+            let allowances = (
+                parseFloat(document.getElementById("businessExpenses").value) +
+                parseFloat(document.getElementById("officeRent").value) +
+                parseFloat(document.getElementById("marketing").value) +
+                parseFloat(document.getElementById("workFromHome").value)
+            ) || 0;
+
+            let taxableIncome = Math.max(adjustedIncome - deductions - exemptions - allowances, 0);
+
+            document.getElementById("result").innerHTML = `Taxable Income: ₹${taxableIncome.toLocaleString()}`;
+        }
+        function gobp() {
+    window.location.href = "bp.html";
+}
+    </script>
+</body>
+</html>
+
